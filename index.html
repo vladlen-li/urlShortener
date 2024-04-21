@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>URL Shortener</title>
+</head>
+<body>
+  <h1>URL Shortener</h1>
+  <form id="shortenForm">
+    <label for="longURL">Long URL:</label><br>
+    <input type="text" id="longURL" name="longURL"><br>
+    <input type="submit" value="Shorten URL">
+  </form>
+  <br>
+  <form id="redirectForm">
+    <label for="shortURL">Short URL:</label><br>
+    <input type="text" id="shortURL" name="shortURL"><br>
+    <input type="submit" value="Open Short URL">
+  </form>
+  <p id="result"></p>
+
+  <script>
+    document.getElementById('shortenForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      var form = event.target;
+      var longURL = form.longURL.value;
+      google.script.run.withSuccessHandler(function(shortURL) {
+        document.getElementById('result').textContent = 'Short URL: ' + shortURL;
+        form.reset();
+      }).generateAndStoreShortURL(longURL);
+    });
+
+    document.getElementById('redirectForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      var form = event.target;
+      var shortURL = form.shortURL.value;
+      google.script.run.withSuccessHandler(function(longURL) {
+        if (longURL) {
+          window.location.href = longURL;
+        } else {
+          document.getElementById('result').textContent = 'Short URL not found.';
+        }
+        form.reset();
+      }).openLongURL(shortURL);
+    });
+  </script>
+</body>
+</html>
